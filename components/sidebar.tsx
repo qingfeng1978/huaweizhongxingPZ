@@ -3,7 +3,7 @@
 import { useCallback, memo } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Zap } from "lucide-react"
 import { 
   Select, 
   SelectContent, 
@@ -11,6 +11,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select"
+import Link from "next/link"
 
 interface SidebarProps {
   collapsed: boolean
@@ -108,6 +109,21 @@ export const Sidebar = memo(function Sidebar({
                 </SelectContent>
               </Select>
             </div>
+
+            {/* 添加批量数据下发入口 */}
+            <div className="space-y-2 pt-4 border-t">
+              <h3 className="text-sm font-medium">高级功能</h3>
+              <Button 
+                variant="outline"
+                className="w-full justify-start gap-2"
+                asChild
+              >
+                <Link href="/batch-deploy">
+                  <Zap className="h-4 w-4" />
+                  批量数据下发
+                </Link>
+              </Button>
+            </div>
           </div>
 
           {/* Collapsed sidebar view */}
@@ -142,6 +158,18 @@ export const Sidebar = memo(function Sidebar({
                 title="语音配置"
               >
                 V
+              </Button>
+
+              {/* 添加批量数据下发图标 - 折叠状态 */}
+              <Button 
+                variant="outline"
+                size="icon"
+                asChild
+                title="批量数据下发"
+              >
+                <Link href="/batch-deploy">
+                  <Zap className="h-4 w-4" />
+                </Link>
               </Button>
             </div>
           )}
