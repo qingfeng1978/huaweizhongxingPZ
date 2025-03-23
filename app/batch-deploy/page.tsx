@@ -66,6 +66,12 @@ export default function BatchDeployPage() {
         if (!snMatch) return;
         const serialNumber = snMatch[1] || "";
         
+        // 验证序列号是否由字母和数字组成
+        const alphanumericPattern = /^[A-Za-z0-9]+$/;
+        if (!alphanumericPattern.test(serialNumber)) {
+          return; // 跳过不符合格式的序列号
+        }
+        
         // 提取逻辑标识
         const loidMatch = block.match(/逻辑标识\s+:\s+([A-Za-z0-9]+)/);
         let loid = "";
@@ -203,7 +209,30 @@ export default function BatchDeployPage() {
         const ponPort = data[4] || "";
         const deviceNum = data[5] || "";
         
-        if (!serialNumber || !slot || !ponPort || !deviceNum) {
+        // 判断序列号是否有效
+        // 为华为下发和中兴C600下发，保持原有判定逻辑
+        if (loid) {
+          // 华为下发 - 验证LOID是否以0734开头
+          if (!loid.startsWith("0734")) {
+            showToast({
+              message: `第${index + 1}行LOID格式不正确，华为下发模式需以0734开头`,
+              type: 'warning'
+            });
+            return;
+          }
+        } else {
+          // 对于华为手工、华为ONU、中兴C300、中兴C600手工，仅验证序列号是否由字母和数字组成
+          const alphanumericPattern = /^[A-Za-z0-9]+$/;
+          if (!alphanumericPattern.test(serialNumber)) {
+            showToast({
+              message: `第${index + 1}行序列号格式不正确，需为字母和数字的组合`,
+              type: 'warning'
+            });
+            return;
+          }
+        }
+        
+        if (!slot || !ponPort || !deviceNum) {
           showToast({
             message: `第${index + 1}行数据不完整，已跳过`,
             type: 'warning'
@@ -494,6 +523,13 @@ export default function BatchDeployPage() {
                       <Label htmlFor="importedData">数据预览（每行一条记录，字段用逗号分隔）</Label>
                       <div className="text-xs text-muted-foreground mb-2">
                         格式: 序列号,LOID,框号,槽位,PON口,设备号
+                      </div>
+                      <div className="text-xs text-muted-foreground mb-2">
+                        <ul className="list-disc pl-4 space-y-1">
+                          <li>华为下发模式: LOID必须以0734开头</li>
+                          <li>华为手工、华为ONU、中兴C300、中兴C600手工模式: 序列号只需为字母和数字的组合</li>
+                          <li>LOID为空时使用序列号验证模式，LOID不为空时使用LOID验证模式</li>
+                        </ul>
                       </div>
                       <Textarea
                         id="importedData"

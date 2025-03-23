@@ -162,9 +162,10 @@ export function useFormValidation({ initialData }: UseFormValidationProps) {
         newErrors.serial = '请输入正确的账号';
       }
     } else if (activeTab === "huawei-manual" || activeTab === "zte-c300" || activeTab === "zte-c600-manual") {
-      // 验证16位字符
-      if (formData.serial.length !== 16) {
-        newErrors.serial = '请输入正确的序列号';
+      // 验证序列号是否为字母和数字的组合，不再验证长度
+      const alphanumericPattern = /^[A-Za-z0-9]+$/;
+      if (!alphanumericPattern.test(formData.serial)) {
+        newErrors.serial = '请输入正确的序列号（字母和数字的组合）';
       }
     }
 
